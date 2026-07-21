@@ -1,0 +1,57 @@
+.post-detail-page-root .detail-page { width: min(calc(100% - 32px), 980px); padding-top: 36px; padding-bottom: 64px; }
+.post-detail-page-root .post-detail, .post-detail-page-root .comments-section { width: 100%; padding: 34px 46px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.post-detail-page-root .detail-title-row { display: flex; margin-bottom: 18px; }
+.post-detail-page-root .post-detail-title { flex: 1; min-width: 0; margin: 0; font-size: 30px; font-weight: 800; line-height: 1.22; overflow-wrap: anywhere; }
+.post-detail-page-root .post-meta-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.post-detail-page-root .author-row { display: flex; align-items: flex-start; gap: 11px; }
+.post-detail-page-root .author-row .avatar-dot { width: 48px; height: 48px; flex-basis: 48px; }
+.post-detail-page-root .author-nickname { font-size: 14px; font-weight: 800; }
+.post-detail-page-root .post-sub-meta { display: flex; gap: 7px; margin-top: 4px; color: var(--text-soft); font-size: 13px; }
+.post-detail-page-root .post-actions { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; padding-top: 14px; font-weight: 800; }
+.post-detail-page-root .link-action-btn, .post-detail-page-root .text-action-btn { padding: 0; border: 0; background: transparent; color: var(--text-soft); font-size: 13px; font-weight: 800; }
+.post-detail-page-root .link-action-btn:hover, .post-detail-page-root .text-action-btn:hover { color: var(--accent-strong); }
+.post-detail-page-root .detail-divider { height: 1px; margin: 28px 0; border: 0; background: var(--line); }
+.post-detail-page-root .post-image { display: flex; width: 100%; height: 430px; align-items: center; justify-content: center; overflow: hidden; border-radius: 8px; background: transparent; }
+.post-detail-page-root .post-image img { width: 100%; height: 100%; object-fit: contain; }
+.post-detail-page-root .post-body { margin-top: 32px; font-size: 17px; line-height: 1.95; white-space: pre-line; }
+.post-detail-page-root .post-body p { margin: 0; }
+.post-detail-page-root .post-body small { display: block; margin-top: 8px; color: var(--text-soft); text-align: right; }
+.post-detail-page-root .post-reaction-bar { display: flex; align-items: center; justify-content: space-between; margin-top: 32px; }
+.post-detail-page-root .reaction-left { display: flex; align-items: center; gap: 22px; }
+.post-detail-page-root .reaction-button { display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0; border: 0; background: transparent; color: var(--text); font-size: 15px; font-weight: 800; }
+.post-detail-page-root .heart-icon { width: 24px; color: var(--helper); font-size: 28px; font-weight: 400; line-height: 1; }
+.post-detail-page-root .heart-icon::before { content: '♡'; }
+.post-detail-page-root .like-button.is-liked .heart-icon::before { content: '♥'; }
+.post-detail-page-root .comment-icon { width: 22px; height: 18px; border: 2px solid currentColor; border-radius: 999px; }
+.post-detail-page-root .comments-section { margin-top: 16px; padding-bottom: 44px; }
+.post-detail-page-root .comments-list { display: flex; flex-direction: column; gap: 28px; }
+.post-detail-page-root .comment-item { display: flex; gap: 16px; width: 100%; }
+.post-detail-page-root .comment-item > .avatar-dot { width: 42px; height: 42px; flex-basis: 42px; }
+.post-detail-page-root .comment-item--reply { margin-top: 10px; padding-left: 28px; }
+.post-detail-page-root .comment-main { flex: 1; min-width: 0; }
+.post-detail-page-root .comment-header { display: flex; align-items: center; gap: 16px; min-height: 36px; }
+.post-detail-page-root .comment-author { font-size: 12px; }
+.post-detail-page-root .comment-date { color: var(--text-soft); font-size: 12px; }
+.post-detail-page-root .comment-actions { display: flex; gap: 4px; margin-left: auto; }
+.post-detail-page-root .comment-content { margin: 6px 0 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+.post-detail-page-root .comment-replies { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+.post-detail-page-root .comment-input-group, .post-detail-page-root .reply-input-group { position: relative; width: 100%; min-height: 130px; margin-top: 28px; overflow: hidden; border: 2px solid var(--line); border-radius: 8px; background: var(--surface); }
+.post-detail-page-root .comment-input { display: block; width: 100%; height: 128px; padding: 14px 28px 44px; border: 0; outline: 0; resize: none; }
+.post-detail-page-root .comment-submit-btn { position: absolute; right: 28px; bottom: 16px; min-height: 26px; padding: 0; background: transparent; color: var(--accent-strong); box-shadow: none; }
+.post-detail-page-root .comment-submit-btn:disabled { background: transparent; color: var(--muted); }
+.post-detail-page-root .reply-input-group { min-height: 112px; margin-top: 12px; border-width: 1px; }
+.post-detail-page-root .reply-input-group textarea { display: block; width: 100%; height: 72px; padding: 12px; border: 0; outline: 0; resize: none; }
+.post-detail-page-root .reply-buttons { display: flex; position: absolute; right: 8px; bottom: 8px; gap: 6px; }
+.post-detail-page-root .reply-submit-btn { height: 28px; padding: 0 12px; border: 0; border-radius: 7px; background: var(--accent); color: #fff; font-size: 11px; font-weight: 800; }
+.post-detail-page-root .reply-submit-btn:disabled { background: var(--disabled); }
+.post-detail-page-root .report-reason-field { display: grid; gap: 7px; max-height: 310px; margin: 18px 0 0; padding: 0; overflow-y: auto; border: 0; text-align: left; }
+.post-detail-page-root .report-reason-option { display: flex; align-items: center; gap: 10px; min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.post-detail-page-root .report-reason-option:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+@media (max-width: 680px) {
+  .post-detail-page-root .detail-page { width: min(calc(100% - 24px), 980px); padding-top: 24px; }
+  .post-detail-page-root .post-detail, .post-detail-page-root .comments-section { padding: 24px 18px; }
+  .post-detail-page-root .post-meta-row, .post-detail-page-root .post-actions, .post-detail-page-root .comment-header { align-items: flex-start; flex-direction: column; }
+  .post-detail-page-root .post-actions, .post-detail-page-root .comment-actions { margin-left: 0; }
+  .post-detail-page-root .post-image { height: 54vw; }
+  .post-detail-page-root .comment-item--reply { padding-left: 12px; }
+}
