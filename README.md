@@ -9,8 +9,6 @@ npm install
 npm run dev
 ```
 
-기본 API 주소는 `.env`의 `VITE_API_BASE_URL=http://localhost:8080`입니다.
-
 ## 검증
 
 ```bash

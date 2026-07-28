@@ -19,6 +19,7 @@ export default function ProfilePage() {
   const [file, setFile] = useState(null)
   const [saving, setSaving] = useState(false)
   const [withdrawOpen, setWithdrawOpen] = useState(false)
+  const [withdrawReason, setWithdrawReason] = useState('')
   const { showToast, showErrorDialog } = useFeedback()
   const navigate = useNavigate()
   const shownError = useRef(null)
@@ -26,6 +27,7 @@ export default function ProfilePage() {
   const fileError = validateImage(file)
   const nicknameChanged = nickname.trim() && nickname.trim() !== profile?.nickname
   const canSubmit = !nicknameError && !fileError && Boolean(nicknameChanged || file)
+  const canWithdraw = Boolean(withdrawReason.trim())
 
   useEffect(() => {
     if (!error || shownError.current === error) return
@@ -48,9 +50,10 @@ export default function ProfilePage() {
   }
 
   const handleWithdraw = async () => {
+    if (!canWithdraw) return
     setSaving(true)
     try {
-      await profileApi.withdraw()
+      await profileApi.withdraw(withdrawReason.trim())
       // 서버의 cookie 정리 여부와 무관하게 204 직후 local auth를 폐기한다.
       clearAuth()
       navigate(ROUTES.LOGIN, { replace: true, state: { withdrawn: true } })
@@ -60,20 +63,35 @@ export default function ProfilePage() {
     } finally { setSaving(false) }
   }
 
+  const openWithdrawDialog = () => {
+    setWithdrawReason('')
+    setWithdrawOpen(true)
+  }
+
+  const closeWithdrawDialog = () => {
+    setWithdrawOpen(false)
+    setWithdrawReason('')
+  }
+
   if (loading) return <div className="page-shell"><Header backTo={ROUTES.POSTS} /><LoadingFallback label="회원정보를 불러오는 중" /></div>
 
   return (
     <div className="page-shell profile-page-root">
       <Header backTo={ROUTES.POSTS} />
       {profile && <main className="page-content profile-page"><section><h2 className="section-title">회원정보수정</h2><form className="profile-form" noValidate onSubmit={handleSave}>
-        <ImageInput variant="change" file={file} currentUrl={profile.profileImageUrl} onChange={setFile} />
+        <ImageInput variant="change" file={file} currentUrl={profile.profileImageUrl} onChange={(file) => setFile(file)} />
         <span className="field-error image-error">{fileError}</span>
         <div className="form-group"><span className="form-label">이메일</span><div className="email-display">{profile.email}</div></div>
         <label className="form-group"><span className="form-label">닉네임</span><small className="old-nickname">현재 닉네임: {profile.nickname}</small><input type="text" maxLength="10" placeholder="변경할 닉네임을 입력해주세요" value={nickname} onChange={(event) => setNickname(event.target.value)} /><span className="field-error">{nicknameError}</span></label>
         <button className="submit-btn" type="submit" disabled={!canSubmit || saving}>{saving ? '수정 중' : '수정하기'}</button>
-        <button className="delete-account-btn" type="button" onClick={() => setWithdrawOpen(true)}>회원 탈퇴</button>
+        <button className="delete-account-btn" type="button" onClick={openWithdrawDialog}>회원 탈퇴</button>
       </form></section></main>}
-      {withdrawOpen && <ConfirmDialog title="회원탈퇴 하시겠습니까?" description="탈퇴 후에는 현재 계정의 정보를 복구할 수 없습니다." danger confirmLabel="탈퇴" confirmDisabled={saving} onConfirm={handleWithdraw} onCancel={() => setWithdrawOpen(false)} />}
+      {withdrawOpen && <ConfirmDialog title="회원탈퇴 하시겠습니까?" description="탈퇴 후에는 현재 계정의 정보를 복구할 수 없습니다." danger confirmLabel="탈퇴" confirmDisabled={saving || !canWithdraw} onConfirm={handleWithdraw} onCancel={closeWithdrawDialog}>
+        <label className="withdraw-reason-field">
+          <span>탈퇴 사유</span>
+          <textarea maxLength="255" placeholder="탈퇴 사유를 입력해주세요" value={withdrawReason} onChange={(event) => setWithdrawReason(event.target.value)} />
+        </label>
+      </ConfirmDialog>}
     </div>
   )
 }

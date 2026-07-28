@@ -23,9 +23,13 @@ export function usePostDetail(postId) {
   }, [load, postId])
 
   const changeCommentCount = useCallback((amount) => setPost((current) => current ? { ...current, commentCount: Math.max(0, Number(current.commentCount || 0) + amount) } : current), [])
-  const setLikeCount = useCallback((likeCount) => setPost((current) => current ? { ...current, likeCount } : current), [])
+  const setLikeStatus = useCallback(({ likeCount, isLiked }) => setPost((current) => current ? {
+    ...current,
+    likeCount: likeCount ?? current.likeCount,
+    isLiked: typeof isLiked === 'boolean' ? isLiked : current.isLiked,
+  } : current), [])
 
-  return { post, loading, error, load, changeCommentCount, setLikeCount }
+  return { post, loading, error, load, changeCommentCount, setLikeStatus }
 }
 
 export function useComments(postId) {

@@ -23,6 +23,6 @@ export function validateNickname(value, { optional = false } = {}) {
 
 export function validateImage(file) {
   if (!file) return ''
-  const extension = file.name.split('.').pop()
+  const extension = file.name.split('.').pop().toLowerCase()
   return ALLOWED_IMAGE_EXTENSIONS.includes(extension) ? '' : MESSAGES.IMAGE_EXTENSION
 }

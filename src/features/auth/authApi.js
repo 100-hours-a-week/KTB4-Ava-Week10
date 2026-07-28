@@ -24,5 +24,5 @@ export function getCurrentUser() {
 }
 
 export function logout() {
-  return apiRequest(API_PATHS.LOGOUT, { method: 'POST' })
+  return apiRequest(API_PATHS.LOGOUT, { auth: true, method: 'POST' })
 }

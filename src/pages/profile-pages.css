@@ -8,6 +8,9 @@
 .profile-page-root .submit-btn, .password-page-root .submit-btn { width: var(--field-width); margin-top: 4px; }
 .profile-page-root .delete-account-btn { width: var(--field-width); height: 38px; margin-top: 10px; border: 0; border-radius: 8px; background: transparent; color: var(--text-soft); font-size: 13px; font-weight: 800; }
 .profile-page-root .delete-account-btn:hover { background: #fff1f1; color: var(--helper); }
+.profile-page-root .withdraw-reason-field { display: block; margin-top: 18px; text-align: left; }
+.profile-page-root .withdraw-reason-field span { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 800; }
+.profile-page-root .withdraw-reason-field textarea { width: 100%; min-height: 96px; padding: 12px 14px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); font: inherit; font-size: 13px; outline: none; }
 .password-page-root .password-page { padding-top: 76px; }
 .password-page-root .required { font-style: normal; }
 @media (max-width: 520px) {
