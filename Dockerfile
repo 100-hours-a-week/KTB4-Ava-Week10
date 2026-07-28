@@ -26,20 +26,13 @@ COPY . .
  
 # Build the React.js application (outputs to /app/dist)
 RUN npm run build
- 
-  
-# # Production Stage
-# FROM nginx:stable-alpine AS production
-# COPY --from=build /app/build /usr/share/nginx/html
-# EXPOSE 80
-# CMD ["nginx", "-g", "daemon off;"]
 
 FROM nginx:stable-alpine
 
 ENV BACKEND_HOST=host.docker.internal
 ENV BACKEND_PORT=8080
 
-COPY nginx.conf /etc/nginx/templates/default.conf.template
+COPY ./nginx/nginx.docker.conf /etc/nginx/templates/default.conf.template
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
