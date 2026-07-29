@@ -1,0 +1,178 @@
+name: Frontend CD
+
+on:
+  workflow_run:
+    workflows: [Frontend CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-production
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish image
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    outputs:
+      image: ${{ steps.image.outputs.name }}
+
+    steps:
+      - name: Checkout verified commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set Docker Hub image name
+        id: image
+        shell: bash
+        env:
+          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          DOCKERHUB_REPOSITORY: ${{ vars.DOCKERHUB_REPOSITORY }}
+        run: |
+          set -Eeuo pipefail
+          if [[ -z "$DOCKERHUB_USERNAME" || -z "$DOCKERHUB_REPOSITORY" ]]; then
+            echo "DOCKERHUB_USERNAME and DOCKERHUB_REPOSITORY must be configured."
+            exit 1
+          fi
+          echo "name=${DOCKERHUB_USERNAME,,}/${DOCKERHUB_REPOSITORY,,}" \
+            >> "$GITHUB_OUTPUT"
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          build-args: |
+            VITE_API_BASE_URL=/api
+          tags: |
+            ${{ steps.image.outputs.name }}:${{ github.event.workflow_run.head_sha }}
+            ${{ steps.image.outputs.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy production
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+      EC2_SSH_PORT: ${{ secrets.EC2_SSH_PORT }}
+      EC2_USER: ${{ secrets.EC2_USER }}
+      EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+      EC2_KNOWN_HOSTS: ${{ secrets.EC2_KNOWN_HOSTS }}
+      DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+      DOCKERHUB_READ_TOKEN: ${{ secrets.DOCKERHUB_READ_TOKEN }}
+      IMAGE: ${{ needs.publish.outputs.image }}:${{ github.event.workflow_run.head_sha }}
+
+    steps:
+      - name: Configure SSH
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$EC2_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Login to Docker Hub on EC2
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          port="${EC2_SSH_PORT:-22}"
+          printf '%s' "$DOCKERHUB_READ_TOKEN" |
+            ssh -p "$port" "$EC2_USER@$EC2_HOST" \
+              "docker login --username '$DOCKERHUB_USERNAME' --password-stdin"
+
+      - name: Deploy immutable image to EC2
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          port="${EC2_SSH_PORT:-22}"
+
+          ssh -p "$port" "$EC2_USER@$EC2_HOST" \
+            "IMAGE='$IMAGE' bash -s" <<'REMOTE'
+          set -Eeuo pipefail
+
+          NAME=community-frontend
+          STAGING_NAME=community-frontend-staging
+          STAGING_PORT=8081
+
+          docker pull "$IMAGE"
+
+          # Clean up any leftover staging container from a previous failed run
+          docker rm -f "$STAGING_NAME" 2>/dev/null || true
+
+          # Start the new image on a staging port while the current
+          # container keeps serving traffic on :80
+          docker run -d \
+            --name "$STAGING_NAME" \
+            --add-host host.docker.internal:host-gateway \
+            -p "$STAGING_PORT":80 \
+            -e BACKEND_HOST=host.docker.internal \
+            -e BACKEND_PORT=8080 \
+            "$IMAGE"
+
+          healthy=false
+          for attempt in {1..10}; do
+            if curl --fail --silent --show-error \
+              "http://127.0.0.1:$STAGING_PORT/" > /dev/null; then
+              healthy=true
+              break
+            fi
+            sleep 2
+          done
+
+          if [ "$healthy" != true ]; then
+            echo "New image failed health check; keeping previous version running."
+            docker logs "$STAGING_NAME"
+            docker rm -f "$STAGING_NAME" 2>/dev/null || true
+            exit 1
+          fi
+
+          # New image is healthy: swap it onto :80
+          docker rm -f "$STAGING_NAME"
+          docker rm -f "$NAME" 2>/dev/null || true
+          docker run -d \
+            --name "$NAME" \
+            --restart unless-stopped \
+            --add-host host.docker.internal:host-gateway \
+            -p 80:80 \
+            -e BACKEND_HOST=host.docker.internal \
+            -e BACKEND_PORT=8080 \
+            "$IMAGE"
+
+          for attempt in {1..10}; do
+            if curl --fail --silent --show-error \
+              http://127.0.0.1/ > /dev/null; then
+              docker image prune -f
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker logs "$NAME"
+          exit 1
+          REMOTE

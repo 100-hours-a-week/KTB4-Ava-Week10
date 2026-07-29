@@ -1,0 +1,59 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, build, and container check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.14.0
+          cache: npm
+
+      - name: Install dependencies
+        env:
+          HUSKY: 0
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint -- --max-warnings=0
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Build application
+        env:
+          VITE_API_BASE_URL: /api
+        run: npm run build
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Validate production image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: false
+          build-args: |
+            VITE_API_BASE_URL=/api
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
