@@ -27,9 +27,15 @@
   pointer-events: auto;
 }
 
-.app-toast > span { flex: 1; }
-.app-toast--error { border-left-color: var(--helper); }
-.app-toast--success { border-left-color: var(--success); }
+.app-toast > span {
+  flex: 1;
+}
+.app-toast--error {
+  border-left-color: var(--helper);
+}
+.app-toast--success {
+  border-left-color: var(--success);
+}
 .app-toast button {
   padding: 5px 8px;
   border: 0;
@@ -38,7 +44,11 @@
   color: var(--accent-strong);
   font-weight: 800;
 }
-.app-toast .toast-close { background: transparent; color: var(--text-soft); font-size: 18px; }
+.app-toast .toast-close {
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 18px;
+}
 
 @media (max-width: 680px) {
   .toast-viewport {

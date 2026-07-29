@@ -1,7 +1,8 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+
 import { ROUTES } from '../../constants/routes'
 import { LoadingFallback } from '../../shared/ui/LoadingFallback'
-import { useAuth } from '../providers/AuthProvider'
+import { useAuth } from '../providers/AuthContext'
 
 export function PublicOnlyLayout() {
   const { user, hydrated } = useAuth()

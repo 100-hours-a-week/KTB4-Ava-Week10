@@ -1,8 +1,10 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
-import { ConfirmDialog } from '../ui/ConfirmDialog'
-import './feedback.css'
+import { useCallback, useMemo, useRef, useState } from 'react'
 
-const FeedbackContext = createContext(null)
+import { ConfirmDialog } from '../ui/ConfirmDialog'
+
+import { FeedbackContext } from './FeedbackContext'
+
+import './feedback.css'
 
 let nextToastId = 1
 
@@ -47,11 +49,19 @@ export function FeedbackProvider({ children }) {
           <div className={`app-toast app-toast--${toast.type}`} key={toast.id} role="status">
             <span>{toast.message}</span>
             {toast.action && (
-              <button type="button" onClick={() => { dismissToast(toast.id); toast.action.onClick() }}>
+              <button
+                type="button"
+                onClick={() => {
+                  dismissToast(toast.id)
+                  toast.action.onClick()
+                }}
+              >
                 {toast.action.label}
               </button>
             )}
-            <button className="toast-close" type="button" aria-label="알림 닫기" onClick={() => dismissToast(toast.id)}>×</button>
+            <button className="toast-close" type="button" aria-label="알림 닫기" onClick={() => dismissToast(toast.id)}>
+              ×
+            </button>
           </div>
         ))}
       </div>
@@ -61,16 +71,16 @@ export function FeedbackProvider({ children }) {
           description={dialog.message}
           confirmLabel={dialog.confirmLabel || '다시 시도'}
           cancelLabel={dialog.cancelLabel || '닫기'}
-          onConfirm={() => { closeErrorDialog(); dialog.onRetry?.() }}
-          onCancel={() => { closeErrorDialog(); dialog.onCancel?.() }}
+          onConfirm={() => {
+            closeErrorDialog()
+            dialog.onRetry?.()
+          }}
+          onCancel={() => {
+            closeErrorDialog()
+            dialog.onCancel?.()
+          }}
         />
       )}
     </FeedbackContext.Provider>
   )
-}
-
-export function useFeedback() {
-  const context = useContext(FeedbackContext)
-  if (!context) throw new Error('useFeedback must be used inside FeedbackProvider')
-  return context
 }

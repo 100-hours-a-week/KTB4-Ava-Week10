@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { getPosts } from './postsApi'
 
 function dedupePosts(posts) {
@@ -40,7 +41,13 @@ export function usePostList() {
   const loadMore = useCallback(async () => {
     const cursor = pagination.nextCursorId
     // null, 동일 cursor, in-flight cursor는 observer가 반복 호출해도 요청하지 않는다.
-    if (!pagination.hasNext || cursor == null || inFlightCursor.current === cursor || completedCursors.current.has(cursor)) return
+    if (
+      !pagination.hasNext ||
+      cursor == null ||
+      inFlightCursor.current === cursor ||
+      completedCursors.current.has(cursor)
+    )
+      return
     inFlightCursor.current = cursor
     setLoadingMore(true)
     setLoadMoreError(null)

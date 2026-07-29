@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
+
 import { ROUTES } from '../../constants/routes'
 import { LoadingFallback } from '../../shared/ui/LoadingFallback'
 import RouteErrorPage from '../errors/RouteErrorPage'
@@ -13,7 +14,11 @@ const PostEditorPage = lazy(() => import('../../pages/PostEditorPage'))
 const ProfilePage = lazy(() => import('../../pages/ProfilePage'))
 const PasswordPage = lazy(() => import('../../pages/PasswordPage'))
 
-const lazyElement = (Component) => <Suspense fallback={<LoadingFallback />}><Component /></Suspense>
+const lazyElement = (Component) => (
+  <Suspense fallback={<LoadingFallback />}>
+    <Component />
+  </Suspense>
+)
 
 export const router = createBrowserRouter([
   { path: ROUTES.ROOT, element: <RootRedirect />, errorElement: <RouteErrorPage /> },

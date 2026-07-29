@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import * as api from './profileApi'
 
 export function useProfile(updateAuthUser) {
@@ -10,9 +11,13 @@ export function useProfile(updateAuthUser) {
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
-    try { setProfile(await api.getProfile()) }
-    catch (loadError) { setError(loadError) }
-    finally { setLoading(false) }
+    try {
+      setProfile(await api.getProfile())
+    } catch (loadError) {
+      setError(loadError)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => {
@@ -22,12 +27,15 @@ export function useProfile(updateAuthUser) {
     load()
   }, [load])
 
-  const save = useCallback(async (fields) => {
-    const nextProfile = await api.updateProfile(fields)
-    setProfile(nextProfile)
-    updateAuthUser(nextProfile)
-    return nextProfile
-  }, [updateAuthUser])
+  const save = useCallback(
+    async (fields) => {
+      const nextProfile = await api.updateProfile(fields)
+      setProfile(nextProfile)
+      updateAuthUser(nextProfile)
+      return nextProfile
+    },
+    [updateAuthUser],
+  )
 
   return { profile, loading, error, load, save }
 }

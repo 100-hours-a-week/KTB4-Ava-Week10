@@ -1,16 +1,66 @@
-.auth-page .center-screen { display: flex; min-height: calc(100vh - 88px); align-items: center; justify-content: center; padding: 24px 16px; }
-.auth-page .auth-card { width: var(--content-narrow); padding: 42px 26px 30px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); box-shadow: var(--shadow-sm); }
-.auth-page .auth-card .form-title { margin-bottom: 30px; }
-.auth-page .auth-form { display: flex; flex-direction: column; align-items: center; }
-.auth-page .submit-btn { width: var(--field-width); margin-top: 4px; }
-.auth-page .auth-link { margin: 16px 0 0; color: var(--accent-strong); font-size: 13px; font-weight: 800; text-align: center; }
-.auth-page .required { font-style: normal; }
-.register-page .center-screen { align-items: flex-start; }
-.register-page .auth-card { padding-top: 36px; }
-.register-page .auth-card .form-title { margin-bottom: 20px; }
-.register-page .image-input { margin-bottom: 0; }
-.register-page .image-error { width: var(--field-width); margin-bottom: 8px; }
+.auth-page .center-screen {
+  display: flex;
+  min-height: calc(100vh - 88px);
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+.auth-page .auth-card {
+  width: var(--content-narrow);
+  padding: 42px 26px 30px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.auth-page .auth-card .form-title {
+  margin-bottom: 30px;
+}
+.auth-page .auth-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.auth-page .submit-btn {
+  width: var(--field-width);
+  margin-top: 4px;
+}
+.auth-page .auth-link {
+  margin: 16px 0 0;
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+.auth-page .required {
+  font-style: normal;
+}
+.register-page .center-screen {
+  align-items: flex-start;
+}
+.register-page .auth-card {
+  padding-top: 36px;
+}
+.register-page .auth-card .form-title {
+  margin-bottom: 20px;
+}
+.register-page .image-input {
+  margin-bottom: 0;
+}
+.register-page .image-error {
+  width: var(--field-width);
+  margin-bottom: 8px;
+}
 @media (max-width: 520px) {
-  .auth-page .center-screen { min-height: calc(100vh - 72px); padding: 20px 12px; }
-  .auth-page .auth-card, .auth-page .field-group, .auth-page .submit-btn, .auth-page .image-input, .register-page .image-error { width: 100%; }
+  .auth-page .center-screen {
+    min-height: calc(100vh - 72px);
+    padding: 20px 12px;
+  }
+  .auth-page .auth-card,
+  .auth-page .field-group,
+  .auth-page .submit-btn,
+  .auth-page .image-input,
+  .register-page .image-error {
+    width: 100%;
+  }
 }

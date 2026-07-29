@@ -14,11 +14,17 @@
   --helper: #d94f4f;
   --success: #0f8f60;
   --disabled: #a7c6c5;
-  --shadow-sm: 0 10px 26px rgba(7, 190, 184, .11);
-  --shadow-md: 0 18px 40px rgba(7, 190, 184, .16);
+  --shadow-sm: 0 10px 26px rgba(7, 190, 184, 0.11);
+  --shadow-md: 0 18px 40px rgba(7, 190, 184, 0.16);
   --content-wide: 640px;
   --content-narrow: 408px;
   --field-width: 355px;
   color-scheme: light;
-  font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', Arial, sans-serif;
+  font-family:
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Apple SD Gothic Neo',
+    Arial,
+    sans-serif;
 }

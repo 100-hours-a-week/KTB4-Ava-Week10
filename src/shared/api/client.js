@@ -1,19 +1,15 @@
 import { API_PATHS } from '../../constants/api'
-import { AUTH_EXPIRED_EVENT } from '../../constants/storage'
 import { API_MESSAGE_MAP, MESSAGES } from '../../constants/messages'
+import { AUTH_EXPIRED_EVENT } from '../../constants/storage'
 import { authStorage } from '../auth/authStorage'
+
 import { ApiError } from './ApiError'
 
 let refreshPromise = null
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || '/api'
 
-const authErrorCodes = new Set([
-  'unauthorized',
-  'invalid_or_expired_token',
-  'token_expired',
-  'not_access_token',
-])
+const authErrorCodes = new Set(['unauthorized', 'invalid_or_expired_token', 'token_expired', 'not_access_token'])
 
 // 비정형 서버 오류와 원시 예외를 사용자에게 노출하지 않는 문구로 정규화한다.
 function normalizeErrorMessage(status, code) {
@@ -62,7 +58,8 @@ async function refreshAccessToken() {
     refreshPromise = rawRequest(API_PATHS.REFRESH, { method: 'POST' })
       .then(({ response, payload }) => {
         const token = payload?.data
-        if (!response.ok || !token?.accessToken) throw new ApiError(MESSAGES.SESSION_EXPIRED, { status: response.status })
+        if (!response.ok || !token?.accessToken)
+          throw new ApiError(MESSAGES.SESSION_EXPIRED, { status: response.status })
         authStorage.setToken(token)
         return token
       })

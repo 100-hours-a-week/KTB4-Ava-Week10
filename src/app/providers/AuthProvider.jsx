@@ -1,9 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { AUTH_EXPIRED_EVENT } from '../../constants/storage'
-import { authStorage } from '../../shared/auth/authStorage'
-import * as authApi from '../../features/auth/authApi'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
-const AuthContext = createContext(null)
+import { AUTH_EXPIRED_EVENT } from '../../constants/storage'
+import * as authApi from '../../features/auth/authApi'
+import { authStorage } from '../../shared/auth/authStorage'
+
+import { AuthContext } from './AuthContext'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -13,22 +14,36 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let active = true
     const hydrate = async () => {
-      if (!authStorage.getToken()) { setHydrated(true); return }
+      if (!authStorage.getToken()) {
+        setHydrated(true)
+        return
+      }
       try {
         const currentUser = await authApi.getCurrentUser()
-        if (active) { setUser(currentUser) }
+        if (active) {
+          setUser(currentUser)
+        }
       } catch {
-        if (active) { authStorage.clear(); setUser(null) }
+        if (active) {
+          authStorage.clear()
+          setUser(null)
+        }
       } finally {
         if (active) setHydrated(true)
       }
     }
     hydrate()
-    return () => { active = false }
+    return () => {
+      active = false
+    }
   }, [])
 
   useEffect(() => {
-    const handleExpired = () => { setSessionExpired(true); setUser(null); setHydrated(true) }
+    const handleExpired = () => {
+      setSessionExpired(true)
+      setUser(null)
+      setHydrated(true)
+    }
     window.addEventListener(AUTH_EXPIRED_EVENT, handleExpired)
     return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleExpired)
   }, [])
@@ -44,8 +59,14 @@ export function AuthProvider({ children }) {
 
   const signOut = useCallback(async () => {
     let requestError
-    try { await authApi.logout() } catch (error) { requestError = error }
-    finally { authStorage.clear(); setUser(null) }
+    try {
+      await authApi.logout()
+    } catch (error) {
+      requestError = error
+    } finally {
+      authStorage.clear()
+      setUser(null)
+    }
     if (requestError) throw requestError
   }, [])
 
@@ -61,12 +82,9 @@ export function AuthProvider({ children }) {
 
   const clearSessionExpired = useCallback(() => setSessionExpired(false), [])
 
-  const value = useMemo(() => ({ user, hydrated, sessionExpired, signIn, signOut, updateUser, clearAuth, clearSessionExpired }), [clearAuth, clearSessionExpired, hydrated, sessionExpired, signIn, signOut, updateUser, user])
+  const value = useMemo(
+    () => ({ user, hydrated, sessionExpired, signIn, signOut, updateUser, clearAuth, clearSessionExpired }),
+    [clearAuth, clearSessionExpired, hydrated, sessionExpired, signIn, signOut, updateUser, user],
+  )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error('useAuth must be used inside AuthProvider')
-  return context
 }

@@ -1,20 +1,99 @@
-.posts-page-root .posts-page { padding-top: 28px; padding-bottom: 64px; }
-.posts-page-root .posts-action-row { display: flex; justify-content: flex-end; margin-bottom: 12px; }
-.posts-page-root .content-write-btn { width: 128px; }
-.posts-page-root .posts-list { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
-.posts-page-root .post-card { display: block; min-height: 82px; padding: 15px 18px 14px; border-bottom: 1px solid var(--line); background: var(--surface); }
-.posts-page-root .post-card:last-child { border-bottom: 0; }
-.posts-page-root .post-card:hover, .posts-page-root .post-card:focus-visible { background: var(--surface-soft); }
-.posts-page-root .post-title-row { display: flex; align-items: center; min-width: 0; gap: 6px; margin-bottom: 8px; }
-.posts-page-root .post-list-title { min-width: 0; margin: 0; font-size: 16px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
-.posts-page-root .comment-count-badge { flex: 0 0 auto; color: var(--accent-strong); font-size: 13px; font-weight: 800; }
-.posts-page-root .post-list-meta { display: flex; align-items: center; min-width: 0; gap: 9px; color: var(--text-soft); font-size: 12px; }
-.posts-page-root .post-author-inline { display: inline-flex; align-items: center; min-width: 0; gap: 6px; color: var(--text); }
-.posts-page-root .post-author-inline .avatar-dot { width: 22px; height: 22px; flex-basis: 22px; }
-.posts-page-root .post-list-meta > span:not(:first-child)::before, .posts-page-root .post-list-meta time::before { display: inline-block; width: 1px; height: 10px; margin-right: 9px; background: var(--line); content: ''; }
-.posts-page-root .load-more-sentinel { height: 1px; }
+.posts-page-root .posts-page {
+  padding-top: 28px;
+  padding-bottom: 64px;
+}
+.posts-page-root .posts-action-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.posts-page-root .content-write-btn {
+  width: 128px;
+}
+.posts-page-root .posts-list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.posts-page-root .post-card {
+  display: block;
+  min-height: 82px;
+  padding: 15px 18px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+.posts-page-root .post-card:last-child {
+  border-bottom: 0;
+}
+.posts-page-root .post-card:hover,
+.posts-page-root .post-card:focus-visible {
+  background: var(--surface-soft);
+}
+.posts-page-root .post-title-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.posts-page-root .post-list-title {
+  min-width: 0;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.posts-page-root .comment-count-badge {
+  flex: 0 0 auto;
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 800;
+}
+.posts-page-root .post-list-meta {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 9px;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+.posts-page-root .post-author-inline {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 6px;
+  color: var(--text);
+}
+.posts-page-root .post-author-inline .avatar-dot {
+  width: 22px;
+  height: 22px;
+  flex-basis: 22px;
+}
+.posts-page-root .post-list-meta > span:not(:first-child)::before,
+.posts-page-root .post-list-meta time::before {
+  display: inline-block;
+  width: 1px;
+  height: 10px;
+  margin-right: 9px;
+  background: var(--line);
+  content: '';
+}
+.posts-page-root .load-more-sentinel {
+  height: 1px;
+}
 @media (max-width: 680px) {
-  .posts-page-root .content-write-btn { width: 100%; }
-  .posts-page-root .post-list-meta { flex-wrap: wrap; }
-  .posts-page-root .post-list-meta > span:not(:first-child)::before, .posts-page-root .post-list-meta time::before { display: none; }
+  .posts-page-root .content-write-btn {
+    width: 100%;
+  }
+  .posts-page-root .post-list-meta {
+    flex-wrap: wrap;
+  }
+  .posts-page-root .post-list-meta > span:not(:first-child)::before,
+  .posts-page-root .post-list-meta time::before {
+    display: none;
+  }
 }

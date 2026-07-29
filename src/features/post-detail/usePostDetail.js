@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import * as api from './postDetailApi'
 
 export function usePostDetail(postId) {
@@ -10,9 +11,13 @@ export function usePostDetail(postId) {
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
-    try { setPost(await api.getPost(postId)) }
-    catch (loadError) { setError(loadError) }
-    finally { setLoading(false) }
+    try {
+      setPost(await api.getPost(postId))
+    } catch (loadError) {
+      setError(loadError)
+    } finally {
+      setLoading(false)
+    }
   }, [postId])
 
   useEffect(() => {
@@ -22,12 +27,26 @@ export function usePostDetail(postId) {
     load()
   }, [load, postId])
 
-  const changeCommentCount = useCallback((amount) => setPost((current) => current ? { ...current, commentCount: Math.max(0, Number(current.commentCount || 0) + amount) } : current), [])
-  const setLikeStatus = useCallback(({ likeCount, isLiked }) => setPost((current) => current ? {
-    ...current,
-    likeCount: likeCount ?? current.likeCount,
-    isLiked: typeof isLiked === 'boolean' ? isLiked : current.isLiked,
-  } : current), [])
+  const changeCommentCount = useCallback(
+    (amount) =>
+      setPost((current) =>
+        current ? { ...current, commentCount: Math.max(0, Number(current.commentCount || 0) + amount) } : current,
+      ),
+    [],
+  )
+  const setLikeStatus = useCallback(
+    ({ likeCount, isLiked }) =>
+      setPost((current) =>
+        current
+          ? {
+              ...current,
+              likeCount: likeCount ?? current.likeCount,
+              isLiked: typeof isLiked === 'boolean' ? isLiked : current.isLiked,
+            }
+          : current,
+      ),
+    [],
+  )
 
   return { post, loading, error, load, changeCommentCount, setLikeStatus }
 }
@@ -41,9 +60,13 @@ export function useComments(postId) {
   const load = useCallback(async () => {
     setLoading(true)
     setError(null)
-    try { setComments((await api.getComments(postId)) || []) }
-    catch (loadError) { setError(loadError) }
-    finally { setLoading(false) }
+    try {
+      setComments((await api.getComments(postId)) || [])
+    } catch (loadError) {
+      setError(loadError)
+    } finally {
+      setLoading(false)
+    }
   }, [postId])
 
   useEffect(() => {
