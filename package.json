@@ -7,7 +7,24 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx}": [
+      "eslint --fix --no-warn-ignored",
+      "prettier --write"
+    ],
+    "*.config.js": [
+      "eslint --fix --no-warn-ignored",
+      "prettier --write"
+    ],
+    "src/**/*.{css,json,md}": "prettier --write",
+    "{package.json,README.md}": "prettier --write",
+    ".github/workflows/*.{yml,yaml}": "prettier --write"
   },
   "dependencies": {
     "react": "^19.2.7",
@@ -20,7 +37,11 @@
     "eslint": "^10.7.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
+    "eslint-plugin-simple-import-sort": "^14.0.0",
     "globals": "^17.7.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.9.6",
     "vite": "^8.1.5"
   }
 }
