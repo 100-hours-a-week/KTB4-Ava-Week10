@@ -64,9 +64,7 @@ jobs:
           push: true
           build-args: |
             VITE_API_BASE_URL=/api
-          tags: |
-            ${{ steps.image.outputs.name }}:${{ github.event.workflow_run.head_sha }}
-            ${{ steps.image.outputs.name }}:latest
+          tags: ${{ steps.image.outputs.name }}:${{ github.event.workflow_run.head_sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -117,20 +115,36 @@ jobs:
           set -Eeuo pipefail
 
           NAME=community-frontend
+          ROLLBACK_NAME=community-frontend-rollback
           STAGING_NAME=community-frontend-staging
           STAGING_PORT=8081
 
           docker pull "$IMAGE"
 
-          # Clean up any leftover staging container from a previous failed run
-          docker rm -f "$STAGING_NAME" 2>/dev/null || true
+          # Recover an interrupted rollback, or remove one left after a
+          # previously successful deployment.
+          if docker container inspect "$ROLLBACK_NAME" >/dev/null 2>&1; then
+            if docker container inspect "$NAME" >/dev/null 2>&1; then
+              docker stop --time 10 "$ROLLBACK_NAME" >/dev/null 2>&1 || true
+              docker rm "$ROLLBACK_NAME"
+            else
+              docker rename "$ROLLBACK_NAME" "$NAME"
+              docker start "$NAME"
+            fi
+          fi
+
+          # Clean up any leftover staging container from a previous failed run.
+          if docker container inspect "$STAGING_NAME" >/dev/null 2>&1; then
+            docker stop --time 10 "$STAGING_NAME" >/dev/null 2>&1 || true
+            docker rm "$STAGING_NAME"
+          fi
 
           # Start the new image on a staging port while the current
           # container keeps serving traffic on :80
           docker run -d \
             --name "$STAGING_NAME" \
             --add-host host.docker.internal:host-gateway \
-            -p "$STAGING_PORT":80 \
+            -p "127.0.0.1:$STAGING_PORT:80" \
             -e BACKEND_HOST=host.docker.internal \
             -e BACKEND_PORT=8080 \
             "$IMAGE"
@@ -148,31 +162,84 @@ jobs:
           if [ "$healthy" != true ]; then
             echo "New image failed health check; keeping previous version running."
             docker logs "$STAGING_NAME"
-            docker rm -f "$STAGING_NAME" 2>/dev/null || true
+            docker stop --time 10 "$STAGING_NAME" >/dev/null 2>&1 || true
+            docker rm "$STAGING_NAME" 2>/dev/null || true
             exit 1
           fi
 
-          # New image is healthy: swap it onto :80
-          docker rm -f "$STAGING_NAME"
-          docker rm -f "$NAME" 2>/dev/null || true
-          docker run -d \
-            --name "$NAME" \
-            --restart unless-stopped \
-            --add-host host.docker.internal:host-gateway \
-            -p 80:80 \
-            -e BACKEND_HOST=host.docker.internal \
-            -e BACKEND_PORT=8080 \
-            "$IMAGE"
+          docker stop --time 10 "$STAGING_NAME"
+          docker rm "$STAGING_NAME"
 
-          for attempt in {1..10}; do
-            if curl --fail --silent --show-error \
-              http://127.0.0.1/ > /dev/null; then
-              docker image prune -f
-              exit 0
+          had_previous=false
+          if docker container inspect "$NAME" >/dev/null 2>&1; then
+            had_previous=true
+            docker stop --time 10 "$NAME"
+            if ! docker rename "$NAME" "$ROLLBACK_NAME"; then
+              echo "Failed to prepare rollback container; restarting the previous version."
+              docker start "$NAME"
+              exit 1
             fi
-            sleep 2
-          done
+          fi
 
-          docker logs "$NAME"
+          started=false
+          if docker run -d \
+              --name "$NAME" \
+              --restart unless-stopped \
+              --add-host host.docker.internal:host-gateway \
+              -p 80:80 \
+              -e BACKEND_HOST=host.docker.internal \
+              -e BACKEND_PORT=8080 \
+              "$IMAGE"; then
+            started=true
+          fi
+
+          healthy=false
+          if [ "$started" = true ]; then
+            for attempt in {1..10}; do
+              if curl --fail --silent --show-error \
+                http://127.0.0.1/ > /dev/null; then
+                healthy=true
+                break
+              fi
+              sleep 2
+            done
+          fi
+
+          if [ "$healthy" = true ]; then
+            if [ "$had_previous" = true ]; then
+              docker rm "$ROLLBACK_NAME" || true
+            fi
+            docker image prune -f || true
+            exit 0
+          fi
+
+          echo "New image failed health check."
+          docker logs "$NAME" 2>/dev/null || true
+          docker stop --time 10 "$NAME" >/dev/null 2>&1 || true
+          docker rm "$NAME" >/dev/null 2>&1 || true
+
+          if [ "$had_previous" = true ]; then
+            echo "Restoring previous frontend container."
+            docker rename "$ROLLBACK_NAME" "$NAME"
+            docker start "$NAME"
+
+            restored=false
+            for attempt in {1..10}; do
+              if curl --fail --silent --show-error \
+                http://127.0.0.1/ > /dev/null; then
+                restored=true
+                break
+              fi
+              sleep 2
+            done
+
+            if [ "$restored" = true ]; then
+              echo "Previous frontend version restored successfully."
+            else
+              echo "Previous frontend version also failed to start."
+              docker logs "$NAME" 2>/dev/null || true
+            fi
+          fi
+
           exit 1
           REMOTE
