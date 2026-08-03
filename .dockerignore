@@ -45,6 +45,7 @@ pnpm-debug.log*
 # Local development files
 # =========================================
 .git/
+.github/
 .gitignore
 .vscode/
 .idea/
