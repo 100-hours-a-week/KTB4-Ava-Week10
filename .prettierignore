@@ -1,4 +1,31 @@
 node_modules
 dist
+dist-ssr
 coverage
+.vite
+.cache
+.eslintcache
+.husky/_
+*.tsbuildinfo
 package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Local environment, logs, and editor/OS files are not source formatting targets.
+.env
+.env.*
+!.env.example
+!.env.*.example
+logs
+*.log
+.vscode
+.idea
+.DS_Store
+Thumbs.db
+
+# Documentation and GitHub workflow files are maintained manually.
+*.md
+*.mdx
+.github/workflows/*.yml
+.github/workflows/*.yaml
