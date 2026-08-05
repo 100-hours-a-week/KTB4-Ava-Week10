@@ -9,11 +9,11 @@ let refreshPromise = null
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') || '/api'
 
-const authErrorCodes = new Set(['unauthorized', 'invalid_or_expired_token', 'token_expired', 'not_access_token'])
+const authErrorCodes = new Set(['UNAUTHORIZED', 'INVALID_OR_EXPIRED_TOKEN', 'TOKEN_EXPIRED', 'NOT_ACCESS_TOKEN'])
 
 // 비정형 서버 오류와 원시 예외를 사용자에게 노출하지 않는 문구로 정규화한다.
 function normalizeErrorMessage(status, code) {
-  const normalizedCode = String(code || '').toLowerCase()
+  const normalizedCode = String(code || '').toUpperCase()
   if (API_MESSAGE_MAP[normalizedCode]) return API_MESSAGE_MAP[normalizedCode]
   if (status === 401 || authErrorCodes.has(normalizedCode)) return MESSAGES.SESSION_EXPIRED
   if (status >= 500) return MESSAGES.GENERIC_ERROR

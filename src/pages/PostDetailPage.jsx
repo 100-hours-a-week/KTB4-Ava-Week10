@@ -33,6 +33,9 @@ export default function PostDetailPage() {
   const shownCommentsError = useRef(null)
   const ownPost = post?.userId === user?.id
   const liked = Boolean(post?.isLiked)
+  const meeting = post?.postType === 'MEETING'
+  const meetingClosed = meeting && post.eventPostStatusType !== 'OPEN'
+  const hasParticipated = meeting && !ownPost && Boolean(post?.isParticipating)
 
   useEffect(() => {
     if (!error || shownPostError.current === error) return
@@ -191,7 +194,17 @@ export default function PostDetailPage() {
           <article className="post-detail">
             <header className="detail-header">
               <div className="detail-title-row">
+                {meeting && <span className="detail-meeting-label">모임</span>}
                 <h2 className="post-detail-title">{post.title}</h2>
+                {meeting && (
+                  <span
+                    className={`detail-meeting-status detail-meeting-status--${post.eventPostStatusType?.toLowerCase()}`}
+                  >
+                    {post.eventPostStatusType === 'OPEN' && '모집 중'}
+                    {post.eventPostStatusType === 'FULL' && '정원 마감'}
+                    {post.eventPostStatusType === 'EXPIRED' && '기간 마감'}
+                  </span>
+                )}
               </div>
               <div className="post-meta-row">
                 <div className="author-row">
@@ -212,7 +225,7 @@ export default function PostDetailPage() {
                   <span>
                     댓글 <strong>{formatCount(post.commentCount)}</strong>
                   </span>
-                  {ownPost && (
+                  {ownPost && !meeting && (
                     <Link className="link-action-btn" to={postEditPath(postId)}>
                       수정
                     </Link>
@@ -229,6 +242,43 @@ export default function PostDetailPage() {
                 </div>
               </div>
               <hr className="detail-divider" />
+              {meeting && (
+                <section
+                  className={`meeting-info-panel meeting-info-panel--${post.eventPostStatusType?.toLowerCase()}`}
+                  aria-label="모임 정보"
+                >
+                  <div className="meeting-info-heading">
+                    <div>
+                      <span>모임 참여 현황</span>
+                      <strong>
+                        {post.applicationCount} <small>/ {post.capacity}명</small>
+                      </strong>
+                    </div>
+                    <span
+                      className={`meeting-info-status meeting-info-status--${post.eventPostStatusType?.toLowerCase()}`}
+                    >
+                      {post.eventPostStatusType === 'OPEN' && '모집 중'}
+                      {post.eventPostStatusType === 'FULL' && '정원 마감'}
+                      {post.eventPostStatusType === 'EXPIRED' && '기간 마감'}
+                    </span>
+                  </div>
+                  <div
+                    className="meeting-capacity-track"
+                    role="progressbar"
+                    aria-label="모임 참여 인원"
+                    aria-valuemin="0"
+                    aria-valuemax={post.capacity}
+                    aria-valuenow={post.participantCount}
+                  >
+                    <span style={{ width: `${(post.participantCount / post.capacity) * 100}%` }} />
+                  </div>
+                  {post.deadline && (
+                    <div className="meeting-info-meta">
+                      <time dateTime={post.deadline}>모집 마감 {formatDate(post.deadline).slice(0, 16)}</time>
+                    </div>
+                  )}
+                </section>
+              )}
               {post.postImageUrl && (
                 <div className="post-image">
                   <img src={post.postImageUrl} alt="게시글 첨부" />
@@ -264,6 +314,10 @@ export default function PostDetailPage() {
             </header>
           </article>
           <section className="comments-section" aria-label="댓글">
+            <div className="comments-section-heading">
+              <h3>{meeting ? '참여 댓글' : '댓글'}</h3>
+              <strong>{formatCount(post.commentCount)}</strong>
+            </div>
             <div id="comments-list">
               {commentsState.loading ? (
                 <LoadingFallback label="댓글을 불러오는 중" />
@@ -285,29 +339,41 @@ export default function PostDetailPage() {
                   onComposerSubmit={submitComposer}
                   onComposerCancel={cancelComposer}
                   busy={busy}
+                  isMeeting={meeting}
+                  readOnly={meetingClosed}
                 />
               )}
             </div>
-            <div className="comment-input-group">
-              <textarea
-                className="comment-input"
-                maxLength="500"
-                value={mainComment}
-                onChange={(event) => {
-                  setMainComment(event.target.value)
-                  if (composer) setComposer(null)
-                }}
-                placeholder="댓글을 남겨주세요!"
-              />
-              <button
-                className="comment-submit-btn"
-                type="button"
-                disabled={!mainComment.trim() || busy}
-                onClick={submitMainComment}
-              >
-                댓글 등록
-              </button>
-            </div>
+            {meetingClosed ? (
+              <div className="comment-locked-state" role="status">
+                <strong>모집이 마감되었습니다.</strong>
+              </div>
+            ) : hasParticipated ? (
+              <div className="comment-locked-state comment-locked-state--joined" role="status">
+                <strong>이미 참여한 모임입니다.</strong>
+              </div>
+            ) : (
+              <div className="comment-input-group">
+                <textarea
+                  className="comment-input"
+                  maxLength="500"
+                  value={mainComment}
+                  onChange={(event) => {
+                    setMainComment(event.target.value)
+                    if (composer) setComposer(null)
+                  }}
+                  placeholder={meeting && !ownPost ? '참여 댓글을 남겨주세요!' : '댓글을 남겨주세요!'}
+                />
+                <button
+                  className="comment-submit-btn"
+                  type="button"
+                  disabled={!mainComment.trim() || busy}
+                  onClick={submitMainComment}
+                >
+                  {meeting && !ownPost ? '참여 신청' : '댓글 등록'}
+                </button>
+              </div>
+            )}
           </section>
         </main>
       )}

@@ -69,27 +69,52 @@ export default function PostsPage() {
         ) : (
           <section className="posts-list" aria-label="게시글 목록">
             {posts.length === 0 && !initialError && <p className="empty-state">아직 작성된 게시글이 없습니다.</p>}
-            {posts.map((post) => (
-              <Link className="post-card" to={postDetailPath(post.id)} key={post.id}>
-                <div className="post-title-row">
-                  <h2 className="post-list-title">{post.title}</h2>
-                  {Number(post.commentCount) > 0 && (
-                    <span className="comment-count-badge">[{formatCount(post.commentCount)}]</span>
+            {posts.map((post) => {
+              const meeting = post.postType === 'MEETING'
+              const closedMeeting =
+                meeting && (post.eventPostStatusType === 'FULL' || post.eventPostStatusType === 'EXPIRED')
+              return (
+                <Link
+                  className={`post-card ${meeting ? 'post-card--meeting' : ''} ${closedMeeting ? 'post-card--closed' : ''}`}
+                  to={postDetailPath(post.id)}
+                  key={post.id}
+                >
+                  <div className="post-title-row">
+                    {meeting && <span className="meeting-label">모임</span>}
+                    <h2 className="post-list-title">{post.title}</h2>
+                    {Number(post.commentCount) > 0 && (
+                      <span className="comment-count-badge">[{formatCount(post.commentCount)}]</span>
+                    )}
+                  </div>
+                  {meeting && (
+                    <div className="meeting-list-summary">
+                      <span className={`meeting-status meeting-status--${post.eventPostStatusType?.toLowerCase()}`}>
+                        {post.eventPostStatusType === 'OPEN' && '모집 중'}
+                        {post.eventPostStatusType === 'FULL' && '정원 마감'}
+                        {post.eventPostStatusType === 'EXPIRED' && '기간 마감'}
+                      </span>
+                      <span>
+                        참여 <strong>{formatCount(post.applicationCount)}</strong> / {formatCount(post.capacity)}명
+                      </span>
+                      {post.deadline && (
+                        <time dateTime={post.deadline}>마감 {formatDate(post.deadline).slice(0, 16)}</time>
+                      )}
+                    </div>
                   )}
-                </div>
-                <div className="post-list-meta">
-                  <span className="post-author-inline">
-                    <span className="avatar-dot">
-                      <img src={post.userImageUrl || DEFAULT_PROFILE_IMAGE} alt="" />
+                  <div className="post-list-meta">
+                    <span className="post-author-inline">
+                      <span className="avatar-dot">
+                        <img src={post.userImageUrl || DEFAULT_PROFILE_IMAGE} alt="" />
+                      </span>
+                      <strong>{post.nickname}</strong>
                     </span>
-                    <strong>{post.nickname}</strong>
-                  </span>
-                  <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
-                  <span>조회 {formatCount(post.viewCount)}</span>
-                  <span>좋아요 {formatCount(post.likeCount)}</span>
-                </div>
-              </Link>
-            ))}
+                    <time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time>
+                    <span>조회 {formatCount(post.viewCount)}</span>
+                    <span>좋아요 {formatCount(post.likeCount)}</span>
+                  </div>
+                </Link>
+              )
+            })}
           </section>
         )}
         {loadMoreError && (

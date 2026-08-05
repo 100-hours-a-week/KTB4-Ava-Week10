@@ -17,6 +17,7 @@ export default function PostEditorPage() {
   const { showToast, showErrorDialog } = useFeedback()
   const { state, update, validation, submit } = usePostEditor({ mode, postId, showToast })
   const shownLoadError = useRef(null)
+  const backTo = mode === 'edit' ? postDetailPath(postId) : ROUTES.POSTS
 
   useEffect(() => {
     if (!state.loadError || shownLoadError.current === state.loadError) return
@@ -44,14 +45,14 @@ export default function PostEditorPage() {
   if (state.loading)
     return (
       <div className="page-shell">
-        <Header backTo={mode === 'edit' ? postDetailPath(postId) : ROUTES.POSTS} />
+        <Header backTo={backTo} />
         <LoadingFallback label="편집기를 준비하는 중" />
       </div>
     )
 
   return (
     <div className="page-shell post-editor-page-root">
-      <Header backTo={mode === 'edit' ? postDetailPath(postId) : ROUTES.POSTS} />
+      <Header backTo={backTo} />
       <main className={`page-content editor-page editor-page--${mode}`}>
         <form className={`post-editor post-editor--${mode}`} noValidate onSubmit={handleSubmit}>
           <span className={`post-mode-badge post-mode-badge--${mode}`}>
@@ -79,6 +80,86 @@ export default function PostEditorPage() {
             </button>
           </div>
           <hr className="editor-divider" />
+          {mode === 'create' ? (
+            <fieldset className="post-type-field">
+              <legend>게시글 유형</legend>
+              <div className="post-type-options">
+                <label className="post-type-option">
+                  <input
+                    type="radio"
+                    name="post-type"
+                    value="GENERAL"
+                    checked={state.type === 'GENERAL'}
+                    disabled={state.submitting}
+                    onChange={() => update('type', 'GENERAL')}
+                  />
+                  <span>
+                    <strong>일반 게시글</strong>
+                    <small>자유롭게 이야기를 나누는 글</small>
+                  </span>
+                </label>
+                <label className="post-type-option">
+                  <input
+                    type="radio"
+                    name="post-type"
+                    value="MEETING"
+                    checked={state.type === 'MEETING'}
+                    disabled={state.submitting}
+                    onChange={() => update('type', 'MEETING')}
+                  />
+                  <span>
+                    <strong>모임 게시글</strong>
+                    <small>댓글 선착순으로 참여하는 글</small>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
+          ) : (
+            <div className="post-type-readonly">
+              <span>게시글 유형</span>
+              <strong>{state.type === 'MEETING' ? '모임 게시글' : '일반 게시글'}</strong>
+              <small>게시글 유형은 등록 후 변경할 수 없습니다.</small>
+            </div>
+          )}
+          {mode === 'create' && state.type === 'MEETING' && (
+            <fieldset className="meeting-settings-field">
+              <legend>
+                모임 설정 <span className="meeting-settings-required">필수</span>
+              </legend>
+              <div className="meeting-settings-grid">
+                <label>
+                  <span>
+                    모집 인원 <span className="required">*</span>
+                  </span>
+                  <div className="capacity-input-wrap">
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      inputMode="numeric"
+                      value={state.capacity ?? ''}
+                      required
+                      disabled={state.submitting}
+                      onChange={(event) => update('capacity', event.target.value)}
+                    />
+                    <span>명</span>
+                  </div>
+                </label>
+                <label>
+                  <span>
+                    모집 마감일 <span className="required">*</span>
+                  </span>
+                  <input
+                    type="datetime-local"
+                    value={state.deadline ?? ''}
+                    required
+                    disabled={state.submitting}
+                    onChange={(event) => update('deadline', event.target.value)}
+                  />
+                </label>
+              </div>
+            </fieldset>
+          )}
           <div className="editor-body-field">
             <label className="visually-hidden" htmlFor="editor-content">
               내용

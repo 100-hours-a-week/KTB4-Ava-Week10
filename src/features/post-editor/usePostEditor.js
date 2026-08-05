@@ -10,6 +10,9 @@ const initialState = {
   content: '',
   file: null,
   currentImageUrl: null,
+  type: 'GENERAL',
+  capacity: '6',
+  deadline: '',
   loading: true,
   loadError: null,
   draftStatus: 'clean',
@@ -95,6 +98,9 @@ export function usePostEditor({ mode, postId, showToast }) {
               title: data.title || '',
               content: data.content || '',
               currentImageUrl: data.postImageUrl || data.imageUrl || null,
+              type: data.type ?? 'GENERAL',
+              capacity: String(data.capacity ?? 6),
+              deadline: data.deadline ? data.deadline.slice(0, 16) : '',
             }
           : { title: '', content: '', currentImageUrl: null }
         if (mode === 'create') temporaryIdRef.current = data?.id ?? data?.temporaryPostId ?? null
@@ -135,6 +141,9 @@ export function usePostEditor({ mode, postId, showToast }) {
         title: currentState.title,
         content: currentState.content,
         file: currentState.file === lastSavedFileRef.current ? null : currentState.file,
+        type: currentState.type,
+        capacity: currentState.capacity,
+        deadline: currentState.deadline,
       }
       latestStateRef.current = { ...currentState, draftStatus: 'saving' }
       dispatch({ type: 'DRAFT_STATUS', status: 'saving' })
@@ -218,7 +227,14 @@ export function usePostEditor({ mode, postId, showToast }) {
   const submit = useCallback(async () => {
     if (validation.title || validation.file) return null
     // 최종 snapshot을 먼저 확정하고 입력을 잠근 뒤 진행 중 autosave의 ID만 이어받는다.
-    const snapshot = { title: state.title.trim(), content: state.content.trim(), file: state.file }
+    const snapshot = {
+      title: state.title.trim(),
+      content: state.content.trim(),
+      file: state.file,
+      type: state.type,
+      capacity: state.capacity,
+      deadline: state.deadline,
+    }
     dispatch({ type: 'SUBMITTING', value: true })
     try {
       if (inFlightSaveRef.current) await inFlightSaveRef.current
@@ -230,13 +246,27 @@ export function usePostEditor({ mode, postId, showToast }) {
         title: snapshot.title !== initial.title ? snapshot.title : null,
         content: snapshot.content !== initial.content ? snapshot.content : null,
         file: snapshot.file || null,
+        type: snapshot.type !== initial.type ? snapshot.type : null,
+        capacity: snapshot.capacity != initial.capacity ? snapshot.capacity : null,
+        deadline: snapshot.deadline != initial.deadline ? snapshot.deadline : null,
       }
       if (!changes.title && !changes.content && !changes.file) throw new Error('변경된 내용이 없습니다.')
       return await api.updatePost(postId, changes)
     } finally {
       dispatch({ type: 'SUBMITTING', value: false })
     }
-  }, [mode, postId, state.content, state.file, state.title, validation.file, validation.title])
+  }, [
+    mode,
+    postId,
+    state.content,
+    state.file,
+    state.title,
+    state.type,
+    state.capacity,
+    state.deadline,
+    validation.file,
+    validation.title,
+  ])
 
   return { state, update, validation, saveDraft, submit }
 }
