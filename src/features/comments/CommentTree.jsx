@@ -17,13 +17,16 @@ const CommentItem = memo(function CommentItem({
   onComposerSubmit,
   onComposerCancel,
   busy,
+  isMeeting,
+  readOnly,
 }) {
   const deleted = Boolean(comment.isDeleted)
   const edited = Boolean(comment.isEdited)
   const own = !deleted && comment.userId === currentUserId
   const active = composer?.anchorId === comment.id
   const replies = Array.isArray(comment.comments) ? comment.comments : []
-  const canReply = !deleted && depth === 0
+  const participantComment = isMeeting && !deleted && depth === 0 && Boolean(comment.isParticipant)
+  const canReply = !readOnly && !deleted && depth === 0
 
   return (
     <article className={`comment-item ${depth ? 'comment-item--reply' : ''}`}>
@@ -33,6 +36,7 @@ const CommentItem = memo(function CommentItem({
       <div className="comment-main">
         <header className="comment-header">
           <strong className="comment-author">{comment.nickname}</strong>
+          {participantComment && <span className="participant-comment-label">참여</span>}
           <time className="comment-date" dateTime={comment.createdAt}>
             {formatDate(comment.createdAt)}
           </time>
@@ -42,12 +46,12 @@ const CommentItem = memo(function CommentItem({
                 답글
               </button>
             )}
-            {own && (
+            {own && !readOnly && (
               <button className="small-outline-btn" type="button" onClick={() => onOpenEdit(comment)}>
                 수정
               </button>
             )}
-            {own && (
+            {own && !readOnly && !participantComment && (
               <button className="small-outline-btn" type="button" onClick={() => onDelete(comment)}>
                 삭제
               </button>
@@ -56,7 +60,7 @@ const CommentItem = memo(function CommentItem({
         </header>
         <p className="comment-content">{comment.content}</p>
         {edited && !deleted && <small className="comment-edited-label">수정됨</small>}
-        {active && (
+        {active && !readOnly && (
           <div className="reply-input-group">
             <textarea
               maxLength="500"
@@ -96,6 +100,8 @@ const CommentItem = memo(function CommentItem({
                 onComposerSubmit={onComposerSubmit}
                 onComposerCancel={onComposerCancel}
                 busy={busy}
+                isMeeting={isMeeting}
+                readOnly={readOnly}
               />
             ))}
           </div>

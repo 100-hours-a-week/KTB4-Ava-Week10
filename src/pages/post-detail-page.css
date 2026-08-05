@@ -13,7 +13,46 @@
 }
 .post-detail-page-root .detail-title-row {
   display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 9px;
   margin-bottom: 18px;
+}
+.post-detail-page-root .detail-meeting-label,
+.post-detail-page-root .detail-meeting-status,
+.post-detail-page-root .meeting-info-status,
+.post-detail-page-root .participant-comment-label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+.post-detail-page-root .detail-meeting-label {
+  min-height: 27px;
+  margin-top: 5px;
+  padding: 0 10px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+.post-detail-page-root .detail-meeting-status {
+  min-height: 26px;
+  margin-top: 5px;
+  padding: 0 10px;
+}
+.post-detail-page-root .detail-meeting-status--open,
+.post-detail-page-root .meeting-info-status--open {
+  background: #e8f8ef;
+  color: var(--success);
+}
+.post-detail-page-root .detail-meeting-status--full,
+.post-detail-page-root .detail-meeting-status--expired,
+.post-detail-page-root .meeting-info-status--full,
+.post-detail-page-root .meeting-info-status--expired {
+  background: #edf1f1;
+  color: var(--text-soft);
 }
 .post-detail-page-root .post-detail-title {
   flex: 1;
@@ -78,6 +117,72 @@
   margin: 28px 0;
   border: 0;
   background: var(--line);
+}
+.post-detail-page-root .meeting-info-panel {
+  margin: -4px 0 28px;
+  padding: 22px 24px;
+  border: 1px solid rgba(7, 190, 184, 0.3);
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--surface-soft), #fff 72%);
+}
+.post-detail-page-root .meeting-info-panel--full,
+.post-detail-page-root .meeting-info-panel--expired {
+  border-color: var(--line);
+  background: #f7f9f9;
+}
+.post-detail-page-root .meeting-info-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.post-detail-page-root .meeting-info-heading > div {
+  display: flex;
+  flex-direction: column;
+}
+.post-detail-page-root .meeting-info-heading > div > span {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 800;
+}
+.post-detail-page-root .meeting-info-heading strong {
+  margin-top: 2px;
+  color: var(--accent-strong);
+  font-size: 25px;
+  line-height: 1.2;
+}
+.post-detail-page-root .meeting-info-heading strong small {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+.post-detail-page-root .meeting-info-status {
+  min-height: 26px;
+  padding: 0 10px;
+}
+.post-detail-page-root .meeting-capacity-track {
+  height: 8px;
+  margin-top: 16px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--muted);
+}
+.post-detail-page-root .meeting-capacity-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+.post-detail-page-root .meeting-info-panel--full .meeting-capacity-track > span,
+.post-detail-page-root .meeting-info-panel--expired .meeting-capacity-track > span {
+  background: var(--disabled);
+}
+.post-detail-page-root .meeting-info-meta {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 12px;
+  color: var(--text-soft);
+  font-size: 12px;
 }
 .post-detail-page-root .post-image {
   display: flex;
@@ -155,6 +260,31 @@
   margin-top: 16px;
   padding-bottom: 44px;
 }
+.post-detail-page-root .comments-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 26px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--line);
+}
+.post-detail-page-root .comments-section-heading h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.post-detail-page-root .comments-section-heading > strong {
+  display: inline-flex;
+  min-width: 30px;
+  min-height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--accent-strong);
+  font-size: 12px;
+}
 .post-detail-page-root .comments-list {
   display: flex;
   flex-direction: column;
@@ -186,6 +316,13 @@
 }
 .post-detail-page-root .comment-author {
   font-size: 12px;
+}
+.post-detail-page-root .participant-comment-label {
+  min-height: 20px;
+  padding: 0 7px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 10px;
 }
 .post-detail-page-root .comment-date {
   color: var(--text-soft);
@@ -248,6 +385,29 @@
 .post-detail-page-root .comment-submit-btn:disabled {
   background: transparent;
   color: var(--muted);
+}
+.post-detail-page-root .comment-locked-state {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 28px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #f5f7f7;
+  color: var(--text-soft);
+  text-align: center;
+}
+.post-detail-page-root .comment-locked-state strong {
+  color: var(--text);
+  font-size: 14px;
+}
+.post-detail-page-root .comment-locked-state--joined {
+  border-color: rgba(7, 190, 184, 0.3);
+  background: var(--surface-soft);
 }
 .post-detail-page-root .reply-input-group {
   min-height: 112px;
@@ -315,6 +475,21 @@
   .post-detail-page-root .post-detail,
   .post-detail-page-root .comments-section {
     padding: 24px 18px;
+  }
+  .post-detail-page-root .post-detail-title {
+    flex-basis: calc(100% - 70px);
+    font-size: 25px;
+  }
+  .post-detail-page-root .detail-meeting-status {
+    margin-left: 64px;
+  }
+  .post-detail-page-root .meeting-info-panel {
+    padding: 18px;
+  }
+  .post-detail-page-root .meeting-info-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
   }
   .post-detail-page-root .post-meta-row,
   .post-detail-page-root .post-actions,
