@@ -122,6 +122,7 @@ export default function PostDetailPage() {
       setMainComment('')
       changeCommentCount(1)
       await commentsState.load()
+      if (meeting) await load()
     }
   }
 
