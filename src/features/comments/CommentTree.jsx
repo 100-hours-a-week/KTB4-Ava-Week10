@@ -31,7 +31,7 @@ const CommentItem = memo(function CommentItem({
   return (
     <article className={`comment-item ${depth ? 'comment-item--reply' : ''}`}>
       <span className="avatar-dot">
-        <img src={DEFAULT_PROFILE_IMAGE} alt="" />
+        <img src={comment.userImageUrl ?? DEFAULT_PROFILE_IMAGE} alt="" />
       </span>
       <div className="comment-main">
         <header className="comment-header">
