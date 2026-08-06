@@ -25,8 +25,8 @@ const CommentItem = memo(function CommentItem({
   const own = !deleted && comment.userId === currentUserId
   const active = composer?.anchorId === comment.id
   const replies = Array.isArray(comment.comments) ? comment.comments : []
-  const participantComment = isMeeting && !deleted && depth === 0 && Boolean(comment.isParticipant)
-  const canReply = !readOnly && !deleted && depth === 0
+  const participantComment = !deleted && depth === 0 && Boolean(comment.isParticipant)
+  const canReply = !readOnly && !deleted && depth === 0 && !isMeeting
 
   return (
     <article className={`comment-item ${depth ? 'comment-item--reply' : ''}`}>
@@ -46,12 +46,12 @@ const CommentItem = memo(function CommentItem({
                 답글
               </button>
             )}
-            {own && !readOnly && (
+            {own && !readOnly && !isMeeting && (
               <button className="small-outline-btn" type="button" onClick={() => onOpenEdit(comment)}>
                 수정
               </button>
             )}
-            {own && !readOnly && !participantComment && (
+            {own && !readOnly && !participantComment && !isMeeting && (
               <button className="small-outline-btn" type="button" onClick={() => onDelete(comment)}>
                 삭제
               </button>
