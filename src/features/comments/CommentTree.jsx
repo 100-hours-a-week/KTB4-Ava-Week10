@@ -51,7 +51,7 @@ const CommentItem = memo(function CommentItem({
                 수정
               </button>
             )}
-            {own && !readOnly && !participantComment && !isMeeting && (
+            {own && !readOnly && !isMeeting && (
               <button className="small-outline-btn" type="button" onClick={() => onDelete(comment)}>
                 삭제
               </button>

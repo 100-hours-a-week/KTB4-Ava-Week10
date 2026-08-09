@@ -21,6 +21,7 @@ cypress/
 cypress/screenshots/
 cypress/videos/
 reports/
+docs/
 
 # =========================================
 # Environment and config files (sensitive)
