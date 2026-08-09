@@ -16,6 +16,7 @@ function normalizeErrorMessage(status, code) {
   const normalizedCode = String(code || '').toUpperCase()
   if (API_MESSAGE_MAP[normalizedCode]) return API_MESSAGE_MAP[normalizedCode]
   if (status === 401 || authErrorCodes.has(normalizedCode)) return MESSAGES.SESSION_EXPIRED
+  if (status === 413) return MESSAGES.IMAGE_SIZE_LIMIT
   if (status >= 500) return MESSAGES.GENERIC_ERROR
   if ([400, 403, 404, 409, 422].includes(status)) return API_MESSAGE_MAP[normalizedCode] || MESSAGES.GENERIC_ERROR
   return MESSAGES.GENERIC_ERROR

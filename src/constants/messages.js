@@ -13,6 +13,7 @@ export const MESSAGES = {
   DELETE_REASON_TOO_LONG: '탈퇴 사유는 최대 255자까지 작성 가능합니다.',
   POST_REQUIRED: '제목, 내용을 모두 작성해주세요.',
   IMAGE_EXTENSION: '허용하는 확장자는 jpg, jpeg, png, gif, webp 입니다.',
+  IMAGE_SIZE_LIMIT: '이미지는 3MB 이하로 업로드해주세요.',
   SESSION_EXPIRED: '로그인이 만료되었습니다. 다시 로그인해주세요.',
   GENERIC_ERROR: '요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.',
   NETWORK_ERROR: '네트워크 연결을 확인한 뒤 다시 시도해주세요.',

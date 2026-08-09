@@ -1,4 +1,4 @@
-import { ALLOWED_IMAGE_EXTENSIONS } from '../../constants/assets'
+import { ALLOWED_IMAGE_EXTENSIONS, MAX_IMAGE_SIZE_BYTES } from '../../constants/assets'
 import { MESSAGES } from '../../constants/messages'
 
 export const EMAIL_PATTERN = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -24,5 +24,7 @@ export function validateNickname(value, { optional = false } = {}) {
 export function validateImage(file) {
   if (!file) return ''
   const extension = file.name.split('.').pop().toLowerCase()
-  return ALLOWED_IMAGE_EXTENSIONS.includes(extension) ? '' : MESSAGES.IMAGE_EXTENSION
+  if (!ALLOWED_IMAGE_EXTENSIONS.includes(extension)) return MESSAGES.IMAGE_EXTENSION
+  if (file.size > MAX_IMAGE_SIZE_BYTES) return MESSAGES.IMAGE_SIZE_LIMIT
+  return ''
 }
