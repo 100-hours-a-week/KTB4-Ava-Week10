@@ -33,7 +33,7 @@ export default function PostEditorPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (validation.title || validation.file) return
+    if (validation.title || validation.file || validation.capacity || validation.deadline) return
     try {
       const post = await submit()
       if (post) navigate(postDetailPath(post.id || postId), { replace: true })
@@ -74,7 +74,13 @@ export default function PostEditorPage() {
             <button
               className="post-save-btn"
               type="submit"
-              disabled={state.submitting || !state.title.trim() || !state.content.trim()}
+              disabled={
+                state.submitting ||
+                !state.title.trim() ||
+                !state.content.trim() ||
+                Boolean(validation.capacity) ||
+                Boolean(validation.deadline)
+              }
             >
               {state.submitting ? '저장 중' : mode === 'edit' ? '저장' : '등록'}
             </button>
@@ -134,7 +140,7 @@ export default function PostEditorPage() {
                   <div className="capacity-input-wrap">
                     <input
                       type="number"
-                      min="1"
+                      min="2"
                       step="1"
                       inputMode="numeric"
                       value={state.capacity ?? ''}
@@ -144,6 +150,7 @@ export default function PostEditorPage() {
                     />
                     <span>명</span>
                   </div>
+                  <span className="field-error">{validation.capacity}</span>
                 </label>
                 <label>
                   <span>
@@ -156,6 +163,7 @@ export default function PostEditorPage() {
                     disabled={state.submitting}
                     onChange={(event) => update('deadline', event.target.value)}
                   />
+                  <span className="field-error">{validation.deadline}</span>
                 </label>
               </div>
             </fieldset>

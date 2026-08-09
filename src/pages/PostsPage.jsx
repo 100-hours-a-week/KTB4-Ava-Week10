@@ -71,6 +71,7 @@ export default function PostsPage() {
             {posts.length === 0 && !initialError && <p className="empty-state">아직 작성된 게시글이 없습니다.</p>}
             {posts.map((post) => {
               const meeting = post.postType === 'MEETING'
+              const meetingApplicationCount = meeting ? Math.max(1, Number(post.applicationCount) || 0) : 0
               const closedMeeting =
                 meeting && (post.eventPostStatusType === 'FULL' || post.eventPostStatusType === 'EXPIRED')
               return (
@@ -94,7 +95,7 @@ export default function PostsPage() {
                         {post.eventPostStatusType === 'EXPIRED' && '기간 마감'}
                       </span>
                       <span>
-                        참여 <strong>{formatCount(post.applicationCount)}</strong> / {formatCount(post.capacity)}명
+                        참여 <strong>{formatCount(meetingApplicationCount)}</strong> / {formatCount(post.capacity)}명
                       </span>
                       {post.deadline && (
                         <time dateTime={post.deadline}>마감 {formatDate(post.deadline).slice(0, 16)}</time>

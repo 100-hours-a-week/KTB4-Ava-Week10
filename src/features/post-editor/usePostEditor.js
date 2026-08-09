@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react'
 
-import { MESSAGES } from '../../constants/messages'
+import { API_MESSAGE_MAP, MESSAGES } from '../../constants/messages'
 import { validateImage } from '../../shared/lib/validation'
 
 import * as api from './postEditorApi'
@@ -22,6 +22,7 @@ const initialState = {
 const hydrationRequests = new Map()
 const AUTOSAVE_IDLE_DELAY_MS = 2000
 const AUTOSAVE_MAX_INTERVAL_MS = 30000
+const MIN_MEETING_CAPACITY = 2
 
 async function getOrCreateTemporaryPost() {
   const temporaryPost = await api.getTemporaryPost()
@@ -214,6 +215,8 @@ export function usePostEditor({ mode, postId, showToast }) {
     return () => window.clearInterval(interval)
   }, [mode, saveDraft, state.loading])
 
+  const isMeetingCreate = mode === 'create' && state.type === 'MEETING'
+  const capacityValue = Number(state.capacity)
   const validation = {
     title:
       !state.title.trim() || !state.content.trim()
@@ -222,10 +225,15 @@ export function usePostEditor({ mode, postId, showToast }) {
           ? '제목은 최대 26자까지 작성 가능합니다.'
           : '',
     file: validateImage(state.file),
+    capacity:
+      isMeetingCreate && !(Number.isInteger(capacityValue) && capacityValue >= MIN_MEETING_CAPACITY)
+        ? API_MESSAGE_MAP.INVALID_CAPACITY
+        : '',
+    deadline: isMeetingCreate && !state.deadline ? API_MESSAGE_MAP.INVALID_DEADLINE : '',
   }
 
   const submit = useCallback(async () => {
-    if (validation.title || validation.file) return null
+    if (validation.title || validation.file || validation.capacity || validation.deadline) return null
     // 최종 snapshot을 먼저 확정하고 입력을 잠근 뒤 진행 중 autosave의 ID만 이어받는다.
     const snapshot = {
       title: state.title.trim(),
@@ -246,9 +254,6 @@ export function usePostEditor({ mode, postId, showToast }) {
         title: snapshot.title !== initial.title ? snapshot.title : null,
         content: snapshot.content !== initial.content ? snapshot.content : null,
         file: snapshot.file || null,
-        type: snapshot.type !== initial.type ? snapshot.type : null,
-        capacity: snapshot.capacity != initial.capacity ? snapshot.capacity : null,
-        deadline: snapshot.deadline != initial.deadline ? snapshot.deadline : null,
       }
       if (!changes.title && !changes.content && !changes.file) throw new Error('변경된 내용이 없습니다.')
       return await api.updatePost(postId, changes)
@@ -266,6 +271,8 @@ export function usePostEditor({ mode, postId, showToast }) {
     state.deadline,
     validation.file,
     validation.title,
+    validation.capacity,
+    validation.deadline,
   ])
 
   return { state, update, validation, saveDraft, submit }

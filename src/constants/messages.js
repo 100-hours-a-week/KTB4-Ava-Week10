@@ -29,7 +29,7 @@ export const API_MESSAGE_MAP = {
   POST_UPDATE_FORBIDDEN: '본인의 게시글만 수정할 수 있습니다.',
   POST_DELETE_FORBIDDEN: '본인의 게시글만 삭제할 수 있습니다.',
   POST_ALREADY_REPORTED: '이미 신고한 게시글입니다.',
-  INVALID_CAPACITY: '모집 인원은 1명 이상으로 설정해주세요.',
+  INVALID_CAPACITY: '모집 인원은 작성자를 포함해 2명 이상으로 설정해주세요.',
   INVALID_DEADLINE: '모집 마감일은 필수이며 현재 시간 이후로 설정해주세요.',
   APPLICATION_COUNT_FULL: '모집 인원이 마감되었습니다.',
   APPLICATION_EXPIRED: '모집 기간이 마감되었습니다.',

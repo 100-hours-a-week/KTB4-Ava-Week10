@@ -36,6 +36,9 @@ export default function PostDetailPage() {
   const meeting = post?.postType === 'MEETING'
   const meetingClosed = meeting && post.eventPostStatusType !== 'OPEN'
   const hasParticipated = meeting && !ownPost && Boolean(post?.isParticipating)
+  const meetingCapacity = Number(post?.capacity) || 0
+  const meetingApplicationCount = meeting ? Math.max(1, Number(post?.applicationCount) || 0) : 0
+  const meetingProgress = meetingCapacity ? Math.min(100, (meetingApplicationCount / meetingCapacity) * 100) : 0
 
   useEffect(() => {
     if (!error || shownPostError.current === error) return
@@ -252,7 +255,7 @@ export default function PostDetailPage() {
                     <div>
                       <span>모임 참여 현황</span>
                       <strong>
-                        {post.applicationCount} <small>/ {post.capacity}명</small>
+                        {meetingApplicationCount} <small>/ {post.capacity}명</small>
                       </strong>
                     </div>
                     <span
@@ -268,10 +271,10 @@ export default function PostDetailPage() {
                     role="progressbar"
                     aria-label="모임 참여 인원"
                     aria-valuemin="0"
-                    aria-valuemax={post.capacity}
-                    aria-valuenow={post.participantCount}
+                    aria-valuemax={meetingCapacity}
+                    aria-valuenow={meetingApplicationCount}
                   >
-                    <span style={{ width: `${(post.participantCount / post.capacity) * 100}%` }} />
+                    <span style={{ width: `${meetingProgress}%` }} />
                   </div>
                   {post.deadline && (
                     <div className="meeting-info-meta">
